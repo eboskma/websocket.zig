@@ -16,7 +16,5 @@ pub fn client(
 
 test {
     // Run tests in imported files in `zig build test`
-    _ = @import("handshake.zig");
-    _ = @import("stream.zig");
-    _ = @import("frame.zig");
+    std.testing.refAllDecls(@This());
 }

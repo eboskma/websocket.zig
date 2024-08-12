@@ -29,7 +29,7 @@ pub const Library = struct {
     }
 };
 
-pub fn create(b: *std.build.Builder, target: std.zig.CrossTarget, mode: std.builtin.Mode) Library {
+pub fn create(b: *std.Build, target: std.zig.CrossTarget, mode: std.builtin.Mode) Library {
     var ret = b.addStaticLibrary("websocket", package_path);
     ret.setTarget(target);
     ret.setBuildMode(mode);

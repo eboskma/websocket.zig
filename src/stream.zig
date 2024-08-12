@@ -561,17 +561,18 @@ test "deflate compress/decompress" {
 
     var compressor_stm = std.ArrayList(u8).init(allocator);
     defer compressor_stm.deinit();
-    var comp = try std.compress.deflate.compressor(allocator, compressor_stm.writer(), .{});
-    defer comp.deinit();
+    var comp = try std.compress.flate.deflate.compressor(.raw, compressor_stm.writer(), .{});
+    // defer comp.deinit();
     _ = try comp.write(input);
-    try comp.close();
+    try comp.flush();
+    try comp.finish();
     const compressed = compressor_stm.items;
     //showBuf(compressed);
-    try testing.expectEqualSlices(u8, compressed, &[_]u8{ 0xf2, 0x48, 0xcd, 0xc9, 0xc9, 0x07, 0x04, 0x00, 0x00, 0xff, 0xff });
+    try testing.expectEqualSlices(u8, &[_]u8{ 0xf2, 0x48, 0xcd, 0xc9, 0xc9, 0x07, 0x00, 0x00, 0x00, 0xff, 0xff, 0x03, 0x00 }, compressed);
 
     var decompressor_stm = io.fixedBufferStream(compressed);
-    var decomp = try std.compress.deflate.decompressor(allocator, decompressor_stm.reader(), null);
-    defer decomp.deinit();
+    var decomp = std.compress.flate.inflate.decompressor(.raw, decompressor_stm.reader());
+    // defer decomp.deinit();
 
     const decompressed = try decomp.reader().readAllAlloc(allocator, std.math.maxInt(usize));
     defer allocator.free(decompressed);
